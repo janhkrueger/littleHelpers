@@ -1,5 +1,7 @@
 -- 
 -- Original from http://www.daharveyjr.com/delete-using-commit-count-db2-stored-procedure
+--
+-- Sample usage: db2 CALL DELETE_WITH_COMMIT_COUNT('TABLENAME', 50000, '1=1');
 -- 
 CREATE PROCEDURE DELETE_WITH_COMMIT_COUNT(IN v_TABLE_NAME VARCHAR(24), IN v_COMMIT_COUNT INTEGER, IN v_WHERE_CONDITION VARCHAR(1024))
     NOT DETERMINISTIC
