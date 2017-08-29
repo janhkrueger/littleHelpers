@@ -1,0 +1,30 @@
+-- 
+-- Original from http://www.daharveyjr.com/delete-using-commit-count-db2-stored-procedure
+-- 
+CREATE PROCEDURE DELETE_WITH_COMMIT_COUNT(IN v_TABLE_NAME VARCHAR(24), IN v_COMMIT_COUNT INTEGER, IN v_WHERE_CONDITION VARCHAR(1024))
+    NOT DETERMINISTIC
+    LANGUAGE SQL
+BEGIN
+ 
+    -- DECLARE Statements
+    DECLARE SQLCODE INTEGER;
+    DECLARE v_DELETE_QUERY VARCHAR(1024);
+    DECLARE v_DELETE_STATEMENT STATEMENT;
+ 
+    SET v_DELETE_QUERY = 'DELETE FROM (SELECT 1 FROM ' || v_TABLE_NAME || ' WHERE ' || v_WHERE_CONDITION
+        || ' FETCH FIRST ' || RTRIM(CHAR(v_COMMIT_COUNT)) || ' ROWS ONLY) AS DELETE_TABLE';
+ 
+    PREPARE v_DELETE_STATEMENT FROM v_DELETE_QUERY;
+     
+    DEL_LOOP:
+        LOOP
+            EXECUTE v_DELETE_STATEMENT;
+            IF SQLCODE = 100 THEN
+                LEAVE DEL_LOOP; 
+            END IF;
+            COMMIT;
+        END LOOP;
+ 
+    COMMIT;
+     
+END@
